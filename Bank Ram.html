@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Bank RAMSENdal - Simulasi Uang Elektronik</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    header {
+      background: #1e3c72;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+    .container {
+      background: #fff;
+      margin: 20px auto;
+      width: 420px;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    h2 {
+      color: #1e3c72;
+      margin-bottom: 10px;
+    }
+    input, button {
+      margin: 5px 0;
+      padding: 10px;
+      width: 95%;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+    button {
+      background: #4facfe;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #1e3c72;
+    }
+    #output {
+      margin-top: 15px;
+      text-align: left;
+      font-size: 14px;
+    }
+    .rekening-item {
+      background: #f0f8ff;
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 6px;
+      border-left: 5px solid #4facfe;
+    }
+  </style>
+</head>
+<body>
+  <header>💳 Bank RAMSENdal - E-Wallet Simulasi</header>
+
+  <div class="container">
+    <h2>Buat Rekening Baru</h2>
+    <input id="nama" placeholder="Nama Nasabah">
+    <button onclick="buatRekening()">Buat Rekening</button>
+  </div>
+
+  <div class="container">
+    <h2>Setor / Tarik</h2>
+    <input id="rekSetor" placeholder="Nomor Rekening">
+    <input id="jumlahSetor" type="number" placeholder="Jumlah">
+    <button onclick="setor()">Setor Dana</button>
+    <button onclick="tarik()">Tarik Dana</button>
+  </div>
+
+  <div class="container">
+    <h2>Transfer Dana</h2>
+    <input id="rekFrom" placeholder="Rekening Pengirim">
+    <input id="rekTo" placeholder="Rekening Penerima">
+    <input id="jumlahTransfer" type="number" placeholder="Jumlah Transfer">
+    <button onclick="transfer()">Transfer</button>
+  </div>
+
+  <div class="container">
+    <h2>Data Rekening</h2>
+    <button onclick="tampilkanRekening()">📋 Lihat Semua Rekening</button>
+    <div id="output"></div>
+  </div>
+
+  <script>
+    let rekeningList = {};
+
+    // Tambahkan 3 rekening contoh
+    rekeningList["1112223334"] = { nama: "Kristanto", saldo: 750000 };
+    rekeningList["5556667778"] = { nama: "Johny", saldo: 500000 };
+    rekeningList["9990001112"] = { nama: "Iqbal", saldo: 250000 };
+
+    function generateNomor() {
+      let nomor = "";
+      for (let i = 0; i < 10; i++) {
+        nomor += Math.floor(Math.random() * 10);
+      }
+      return nomor;
+    }
+
+    function buatRekening() {
+      let nama = document.getElementById("nama").value;
+      if (!nama) { alert("Nama harus diisi!"); return; }
+      let nomor = generateNomor();
+      rekeningList[nomor] = { nama: nama, saldo: 0 };
+      tampilkanRekening(); // langsung tampilkan agar tidak lupa
+    }
+
+    function setor() {
+      let rek = document.getElementById("rekSetor").value;
+      let jumlah = parseInt(document.getElementById("jumlahSetor").value);
+      if (rekeningList[rek]) {
+        rekeningList[rek].saldo += jumlah;
+        tampilkanRekening();
+        alert("Setor berhasil!");
+      } else alert("Nomor rekening tidak ditemukan!");
+    }
+
+    function tarik() {
+      let rek = document.getElementById("rekSetor").value;
+      let jumlah = parseInt(document.getElementById("jumlahSetor").value);
+      if (rekeningList[rek]) {
+        if (rekeningList[rek].saldo >= jumlah) {
+          rekeningList[rek].saldo -= jumlah;
+          tampilkanRekening();
+          alert("Tarik berhasil!");
+        } else alert("Saldo tidak cukup!");
+      } else alert("Nomor rekening tidak ditemukan!");
+    }
+
+    function transfer() {
+      let from = document.getElementById("rekFrom").value;
+      let to = document.getElementById("rekTo").value;
+      let jumlah = parseInt(document.getElementById("jumlahTransfer").value);
+      if (rekeningList[from] && rekeningList[to]) {
+        if (rekeningList[from].saldo >= jumlah) {
+          rekeningList[from].saldo -= jumlah;
+          rekeningList[to].saldo += jumlah;
+          tampilkanRekening();
+          alert("Transfer berhasil!");
+        } else alert("Saldo pengirim tidak cukup!");
+      } else alert("Nomor rekening tidak valid!");
+    }
+
+    function tampilkanRekening() {
+      let out = "";
+      for (let rek in rekeningList) {
+        out += `<div class="rekening-item">
+                  <strong>${rek}</strong> - ${rekeningList[rek].nama}<br>
+                  Saldo: Rp ${rekeningList[rek].saldo}
+                </div>`;
+      }
+      document.getElementById("output").innerHTML = out || "Belum ada rekening.";
+    }
+
+    // tampilkan rekening default saat pertama kali dibuka
+    tampilkanRekening();
+  </script>
+</body>
+</html>
